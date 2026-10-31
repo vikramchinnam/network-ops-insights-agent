@@ -11,5 +11,6 @@ SHOW DATABASES  LIKE 'NOI%';
 USE WAREHOUSE NOI_WH_DEV;
 SELECT CURRENT_USER() AS who, CURRENT_ROLE() AS role, CURRENT_WAREHOUSE() AS wh, CURRENT_REGION() AS region;
 
--- Cortex smoke test: should return a short sentence
-SELECT SNOWFLAKE.CORTEX.COMPLETE('mistral-large2', 'Say hello to a network engineer in one sentence.') AS cortex_ok;
+-- Cortex smoke test: should return a short sentence.
+-- New accounts must use AI_COMPLETE; legacy SNOWFLAKE.CORTEX.COMPLETE is blocked.
+SELECT AI_COMPLETE('claude-haiku-4-5', 'Say hello to a network engineer in one sentence.') AS cortex_ok;
