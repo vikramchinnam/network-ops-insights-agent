@@ -5,7 +5,7 @@ models:
     description: One row per customer with partner details and device footprint.
     columns:
       - name: customer_id
-        description: Customer identifier; also the tenant key for row-level security (Stage 3).
+        description: Customer identifier; also the tenant key for row-level security (Stage 5).
         tests: [unique, not_null]
       - name: industry
         tests:
@@ -14,7 +14,7 @@ models:
                 values: ["Healthcare", "Higher Education", "K-12 Education", "Manufacturing", "Retail",
                          "Hospitality", "State and Local Government", "Sports and Venues"]
       - name: partner_id
-        description: Partner tenant key for row-level security (Stage 3).
+        description: Partner tenant key for row-level security (Stage 5).
         tests: [not_null]
 
   - name: dim_site

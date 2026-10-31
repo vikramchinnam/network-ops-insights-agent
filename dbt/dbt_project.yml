@@ -20,3 +20,10 @@ models:
     marts:
       +materialized: table
       +schema: marts
+    semantic:
+      +materialized: semantic_view   # from the Snowflake-Labs/dbt_semantic_view package
+      +schema: semantic
+      +copy_grants: true             # keep grants when dbt replaces the view
+      +persist_docs:                 # descriptions live in the DDL (COMMENT, WITH SYNONYMS)
+        relation: false
+        columns: false

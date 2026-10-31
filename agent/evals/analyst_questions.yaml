@@ -1,0 +1,111 @@
+# Evaluation set for Cortex Analyst (Stage 3), reused by agent evaluations (Stage 5-6).
+#
+# Each question has reference SQL written directly against the marts. Ground truth is
+# computed by running that SQL at evaluation time, so answers stay correct as data is
+# regenerated. Run Analyst's answer and the reference side by side and compare.
+#
+# Database: replace NOI_DEV with NOI_PROD when evaluating Prod.
+
+questions:
+  - id: q01_roaming_by_firmware
+    question: Which access point firmware version has the most roaming failures per device per day?
+    tests: synonym mapping (roaming), filtering to access points, average vs total
+    reference_sql: |
+      select firmware_version, round(avg(roaming_failure_count), 2) as avg_daily_roaming_failures
+      from NOI_DEV.MARTS.FCT_DEVICE_HEALTH_DAILY
+      where device_type = 'access_point'
+      group by 1 order by 2 desc
+
+  - id: q02_uptime_by_industry
+    question: What was the average device uptime by industry over the last 30 days?
+    tests: join health to customers through devices and sites, relative date filter
+    reference_sql: |
+      select c.industry, round(avg(h.uptime_pct), 2) as avg_uptime_pct
+      from NOI_DEV.MARTS.FCT_DEVICE_HEALTH_DAILY h
+      join NOI_DEV.MARTS.DIM_CUSTOMER c on h.customer_id = c.customer_id
+      where h.metric_date >= dateadd(day, -30, current_date())
+      group by 1 order by 2
+
+  - id: q03_open_critical_by_industry
+    question: How many open critical cases are there in each industry?
+    tests: business definition of critical (P1 or P2)
+    reference_sql: |
+      select industry, count(*) as open_critical_cases
+      from NOI_DEV.MARTS.FCT_SUPPORT_CASES
+      where is_open and severity in ('P1', 'P2')
+      group by 1 order by 2 desc
+
+  - id: q04_top_customers_open_cases
+    question: Which 5 customers have the most open support cases?
+    tests: ranking and limit, case to customer join path
+    reference_sql: |
+      select c.customer_name, count(*) as open_cases
+      from NOI_DEV.MARTS.FCT_SUPPORT_CASES s
+      join NOI_DEV.MARTS.DIM_CUSTOMER c on s.customer_id = c.customer_id
+      where s.is_open
+      group by 1 order by 2 desc limit 5
+
+  - id: q05_mttr_by_severity
+    question: What is the average time to resolve cases by severity?
+    tests: synonym mapping (MTTR / time to resolve), excludes open cases
+    reference_sql: |
+      select severity, round(avg(resolution_hours), 2) as avg_resolution_hours
+      from NOI_DEV.MARTS.FCT_SUPPORT_CASES
+      where resolution_hours is not null
+      group by 1 order by 1
+
+  - id: q06_end_of_sale_by_model
+    question: How many devices reach end of sale within the next 12 months, by model?
+    tests: boolean dimension, device counts
+    reference_sql: |
+      select model, count(*) as devices
+      from NOI_DEV.MARTS.DIM_DEVICE
+      where is_end_of_sale_within_12_months
+      group by 1 order by 2 desc
+
+  - id: q07_renewing_arr_by_partner
+    question: What is the total annual contract value renewing in the next 90 days, by partner?
+    tests: currency metric, subscription to partner join
+    reference_sql: |
+      select c.partner_name, round(sum(s.annual_value_usd), 2) as renewing_annual_value_usd
+      from NOI_DEV.MARTS.FCT_SUBSCRIPTIONS s
+      join NOI_DEV.MARTS.DIM_CUSTOMER c on s.customer_id = c.customer_id
+      where s.is_renewing_within_90_days
+      group by 1 order by 2 desc
+
+  - id: q08_sites_most_disconnects_last_week
+    question: Which 10 sites had the most disconnects in the last 7 days?
+    tests: relative date, site grain, ranking
+    reference_sql: |
+      select si.site_name, si.site_type, c.customer_name, sum(h.disconnect_count) as disconnects
+      from NOI_DEV.MARTS.FCT_DEVICE_HEALTH_DAILY h
+      join NOI_DEV.MARTS.DIM_SITE si on h.site_id = si.site_id
+      join NOI_DEV.MARTS.DIM_CUSTOMER c on h.customer_id = c.customer_id
+      where h.metric_date >= dateadd(day, -7, current_date())
+      group by 1, 2, 3 order by 4 desc limit 10
+
+  - id: q09_cases_by_category_30d
+    question: How many support cases were opened in each category in the last 30 days?
+    tests: case date dimension, category synonym (issue type)
+    reference_sql: |
+      select category, count(*) as cases
+      from NOI_DEV.MARTS.FCT_SUPPORT_CASES
+      where opened_date >= dateadd(day, -30, current_date())
+      group by 1 order by 2 desc
+
+  - id: q10_renewals_with_open_critical
+    question: Which customers renewing in the next 90 days have open critical cases?
+    tests: combines metrics from two fact tables through a shared customer dimension
+    reference_sql: |
+      with renewing as (
+        select customer_id, sum(annual_value_usd) as renewing_annual_value_usd
+        from NOI_DEV.MARTS.FCT_SUBSCRIPTIONS where is_renewing_within_90_days group by 1
+      ), critical as (
+        select customer_id, count(*) as open_critical_cases
+        from NOI_DEV.MARTS.FCT_SUPPORT_CASES where is_open and severity in ('P1', 'P2') group by 1
+      )
+      select c.customer_name, r.renewing_annual_value_usd, k.open_critical_cases
+      from renewing r
+      join critical k on r.customer_id = k.customer_id
+      join NOI_DEV.MARTS.DIM_CUSTOMER c on r.customer_id = c.customer_id
+      order by k.open_critical_cases desc
