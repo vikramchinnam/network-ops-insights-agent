@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: network_ops_analytics
+    description: >
+      Snowflake semantic view over the marts, used by Cortex Analyst (Stage 3) and as a
+      tool of the Cortex Agent (Stage 5). Built with the dbt_semantic_view package.
