@@ -1,0 +1,11 @@
+# Snowflake CLI connection — EXAMPLE ONLY.
+# Copy to ~/.snowflake/config.toml (outside the repo) and fill in your values.
+# The real config.toml is gitignored and must never be committed.
+
+default_connection_name = "noi"
+
+[connections.noi]
+account = "<orgname>-<accountname>"          # Snowsight → your name → Account → copy account identifier
+user = "<your_username>"
+authenticator = "SNOWFLAKE_JWT"              # key-pair auth, no password
+private_key_file = "~/.snowflake/keys/noi_rsa_key.p8"

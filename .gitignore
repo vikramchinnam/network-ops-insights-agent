@@ -1,0 +1,23 @@
+# --- Secrets: never commit these ---
+.env
+*.p8
+*.pem
+*.key
+config.toml
+profiles.yml
+
+# --- Python ---
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# --- dbt ---
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
