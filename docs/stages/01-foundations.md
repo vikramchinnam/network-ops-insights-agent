@@ -13,7 +13,8 @@
 1. Sign up at [signup.snowflake.com](https://signup.snowflake.com).
 2. Choose **Enterprise** edition, cloud **AWS**, region **US West (Oregon)** or **US East (N. Virginia)**. Cortex features tend to arrive in these regions first; cross-region inference (script `04`) covers the gaps.
 3. Activate the account from the email and log in to Snowsight.
-4. Copy your **account identifier**: click your name (bottom left) → **Account** → copy the identifier in `orgname-accountname` form.
+4. **Add a payment method** (Admin → Billing & Terms). AI features (Cortex, AI functions, agents) are disabled on self-service trials until a card is added. Adding one does not end the trial or upgrade the account; free credits are still used first.
+5. Copy your **account identifier**: click your name (bottom left) → **Account** → copy the identifier in `orgname-accountname` form.
 
 ## 2. Install the tools
 
@@ -107,4 +108,6 @@ Tick Stage 1 in the README in the same PR or the next one.
 | `JWT token is invalid` | Public key not set, or set on the wrong user | Rerun the `ALTER USER ... SET RSA_PUBLIC_KEY` step |
 | `Insufficient privileges to operate on ...` | Script run before the one that grants the role | Run the scripts in numeric order |
 | `Role 'NOI_ADMIN' does not exist` in `90_verify` | `00_roles.sql` failed | Rerun `00_roles.sql` and read its output |
-| Cortex `COMPLETE` fails | Model not available in region | Confirm `04_cortex_access.sql` ran; try another model name |
+| `SNOWFLAKE.CORTEX.COMPLETE is not available on this account` | New accounts must use the newer AI functions | Use `AI_COMPLETE` (already in `90_verify.sql`) |
+| `AI function ... is not available for trial accounts` | AI features are off until a payment method is added | Add a card in Admin → Billing & Terms, then rerun |
+| `AI_COMPLETE` model error | Model not available in region | Confirm `04_cortex_access.sql` ran; try another model name |

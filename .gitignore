@@ -5,6 +5,8 @@
 *.key
 config.toml
 profiles.yml
+# dbt/profiles.yml uses env vars only, so it is safe to commit
+!dbt/profiles.yml
 
 # --- Python ---
 .venv/
@@ -17,7 +19,11 @@ dbt/target/
 dbt/dbt_packages/
 dbt/logs/
 
+# --- Local generator output ---
+data/
+
 # --- Editors / OS ---
 .vscode/
 .idea/
 .DS_Store
+dbt/.user.yml

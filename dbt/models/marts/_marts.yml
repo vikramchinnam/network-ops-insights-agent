@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: One row per customer with partner details and device footprint.
+    columns:
+      - name: customer_id
+        description: Customer identifier; also the tenant key for row-level security (Stage 3).
+        tests: [unique, not_null]
+      - name: industry
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["Healthcare", "Higher Education", "K-12 Education", "Manufacturing", "Retail",
+                         "Hospitality", "State and Local Government", "Sports and Venues"]
+      - name: partner_id
+        description: Partner tenant key for row-level security (Stage 3).
+        tests: [not_null]
+
+  - name: dim_site
+    description: One row per site.
+    columns:
+      - name: site_id
+        tests: [unique, not_null]
+
+  - name: dim_device
+    description: One row per access point or switch.
+    columns:
+      - name: device_id
+        tests: [unique, not_null]
+      - name: site_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_site')
+                field: site_id
+
+  - name: fct_device_health_daily
+    description: Daily device health. Grain is device_id + metric_date.
+    columns:
+      - name: device_id
+        tests: [not_null]
+      - name: metric_date
+        tests: [not_null]
+      - name: uptime_pct
+        description: Percent of the day the device was up, 0 to 100.
+      - name: roaming_failure_count
+        description: Failed client roams between access points. NULL for switches.
+
+  - name: fct_support_cases
+    description: One row per support case, including free-text description (used by Cortex Search in Stage 4).
+    columns:
+      - name: case_id
+        tests: [unique, not_null]
+      - name: resolution_hours
+        description: Hours from open to close. NULL while the case is open.
+
+  - name: fct_subscriptions
+    description: One row per subscription with renewal flags.
+    columns:
+      - name: subscription_id
+        tests: [unique, not_null]
