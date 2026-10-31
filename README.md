@@ -32,8 +32,8 @@ Raw synthetic data  ◄── Snowpark Python procedures (generator, health scor
 
 ## Roadmap
 
-- [ ] **Stage 1 — Foundations:** repo, Snowflake CLI, roles, warehouses, cost guardrails → [guide](docs/stages/01-foundations.md)
-- [ ] **Stage 2 — dbt basics:** synthetic data, staging and marts, Dev/Prod targets
+- [x] **Stage 1 — Foundations:** repo, Snowflake CLI, roles, warehouses, cost guardrails → [guide](docs/stages/01-foundations.md)
+- [ ] **Stage 2 — dbt basics:** synthetic data, staging and marts, Dev/Prod targets → [guide](docs/stages/02-dbt-basics.md)
 - [ ] **Stage 3 — Semantic view:** `dbt_semantic_view` package + Cortex Analyst
 - [ ] **Stage 4 — Cortex Search:** case notes, KB articles, release notes
 - [ ] **Stage 5 — Cortex Agent:** agent spec + Python client
@@ -43,4 +43,10 @@ Raw synthetic data  ◄── Snowpark Python procedures (generator, health scor
 
 ## Quick start
 
-See [Stage 1 guide](docs/stages/01-foundations.md).
+```powershell
+uv sync                                                    # Python env with Snowpark + dbt
+uv run python -m noi_snowpark.generate_data --env dev      # load synthetic data
+cd dbt; uv run dbt build                                   # build and test models
+```
+
+Full setup: [Stage 1 guide](docs/stages/01-foundations.md), then [Stage 2 guide](docs/stages/02-dbt-basics.md).

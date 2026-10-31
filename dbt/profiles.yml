@@ -1,0 +1,39 @@
+# Safe to commit: no secrets here. Credentials come from environment variables:
+#   SNOWFLAKE_ACCOUNT, SNOWFLAKE_USER, SNOWFLAKE_PRIVATE_KEY_PATH
+network_ops:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH') }}"
+      role: NOI_DBT_DEV
+      warehouse: NOI_WH_DEV
+      database: NOI_DEV
+      schema: DBT
+      threads: 4
+
+    # Used by CI in Stage 8: isolated schemas per pull request inside NOI_DEV
+    ci:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '') }}"
+      role: NOI_DBT_DEV
+      warehouse: NOI_WH_DEV
+      database: NOI_DEV
+      schema: "{{ env_var('DBT_CI_SCHEMA', 'CI') }}"
+      threads: 4
+
+    # Prod is deployed by CI only (Stage 8)
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '') }}"
+      role: NOI_DBT_PROD
+      warehouse: NOI_WH_PROD
+      database: NOI_PROD
+      schema: DBT
+      threads: 4

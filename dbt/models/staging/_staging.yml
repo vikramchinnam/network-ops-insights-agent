@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: stg_partners
+    description: Channel partners (resellers and MSPs). One row per partner.
+    columns:
+      - name: partner_id
+        tests: [unique, not_null]
+      - name: partner_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["Reseller", "MSP"]
+
+  - name: stg_customers
+    description: End customers. One row per customer.
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+      - name: partner_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_partners')
+                field: partner_id
+
+  - name: stg_sites
+    description: Customer locations. One row per site.
+    columns:
+      - name: site_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+
+  - name: stg_devices
+    description: Access points and switches. One row per device.
+    columns:
+      - name: device_id
+        tests: [unique, not_null]
+      - name: device_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["access_point", "switch"]
+
+  - name: stg_device_health_daily
+    description: Daily health per device. One row per device per day.
+
+  - name: stg_support_cases
+    description: Support cases with free-text descriptions. One row per case.
+    columns:
+      - name: case_id
+        tests: [unique, not_null]
+      - name: severity
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["P1", "P2", "P3", "P4"]
+
+  - name: stg_subscriptions
+    description: Customer subscriptions. One row per subscription.
+    columns:
+      - name: subscription_id
+        tests: [unique, not_null]
