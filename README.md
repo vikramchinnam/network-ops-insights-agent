@@ -34,8 +34,8 @@ Raw synthetic data  ◄── Snowpark Python procedures (generator, health scor
 
 - [x] **Stage 1 — Foundations:** repo, Snowflake CLI, roles, warehouses, cost guardrails → [guide](docs/stages/01-foundations.md)
 - [x] **Stage 2 — dbt basics:** synthetic data, staging and marts, Dev/Prod targets → [guide](docs/stages/02-dbt-basics.md)
-- [ ] **Stage 3 — Semantic view:** `dbt_semantic_view` package + Cortex Analyst → [guide](docs/stages/03-semantic-view.md)
-- [ ] **Stage 4 — Cortex Search:** case notes, KB articles, release notes
+- [x] **Stage 3 — Semantic view:** `dbt_semantic_view` package + Cortex Analyst → [guide](docs/stages/03-semantic-view.md)
+- [ ] **Stage 4 — Cortex Search:** case notes, KB articles, release notes → [guide](docs/stages/04-cortex-search.md)
 - [ ] **Stage 5 — Cortex Agent:** agent spec + Python client
 - [ ] **Stage 6 — Snowpark procedures:** generator, health score, evals
 - [ ] **Stage 7 — Containers:** chat app on Snowpark Container Services

@@ -1,0 +1,49 @@
+# Evaluation set for Cortex Search (Stage 4), reused by agent evaluations later.
+#
+# Each query lists the documents that count as a correct hit. A query passes if any
+# expected document appears in the top 5 results (hit@5). The runner also reports
+# MRR (mean reciprocal rank): 1.0 means the right document was always ranked first.
+#
+# Queries are written the way people actually ask, not with the article's exact words,
+# so they test meaning-based retrieval rather than keyword matching.
+
+queries:
+  - id: s01_roaming_symptom
+    query: clients disconnect when walking between access points after an upgrade
+    expected: [KB-1001, RN-AP-10.2.1, RN-AP-10.3.0]
+
+  - id: s02_roaming_fix
+    query: which firmware version fixes the roaming bug
+    expected: [RN-AP-10.3.0, KB-1001]
+
+  - id: s03_radius_timeouts
+    query: 802.1X logins failing with RADIUS server timeouts
+    expected: [KB-1002]
+
+  - id: s04_guest_portal
+    query: guest wifi login page keeps reloading
+    expected: [KB-1003]
+
+  - id: s05_port_flapping
+    query: switch ports keep going up and down and APs lose power
+    expected: [KB-1004, RN-SW-8.5.1, RN-SW-8.4.2]
+
+  - id: s06_ax200_replacement
+    query: what should we replace the AX-200 with
+    expected: [KB-1005]
+
+  - id: s07_upgrade_rollback
+    query: upgrade got stuck and the device went back to the old version
+    expected: [KB-1007]
+
+  - id: s08_dense_slow_wifi
+    query: wifi is slow in crowded rooms at peak times
+    expected: [KB-1008]
+
+  - id: s09_rma
+    query: how do I get a replacement for a dead access point
+    expected: [KB-1010]
+
+  - id: s10_hospital_design
+    query: wifi recommendations for a hospital using voice badges
+    expected: [KB-1012]

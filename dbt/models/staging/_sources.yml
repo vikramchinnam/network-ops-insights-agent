@@ -13,3 +13,5 @@ sources:
       - name: device_health_daily
       - name: support_cases
       - name: subscriptions
+      - name: kb_articles
+      - name: release_notes

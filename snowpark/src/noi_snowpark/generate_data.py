@@ -2,8 +2,8 @@
 
 Produces a realistic, fully fictional networking customer base:
 partners, customers, sites, devices (access points and switches),
-daily device health, support cases with free-text descriptions, and
-subscriptions.
+daily device health, support cases with free-text descriptions,
+subscriptions, knowledge base articles and firmware release notes.
 
 Planted signals the agent should be able to find later:
   * Access points on firmware 10.2.1 have ~4x more roaming failures and
@@ -30,6 +30,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from faker import Faker
+
+from noi_snowpark.knowledge_base import build_kb_articles, build_release_notes
 
 # --------------------------------------------------------------------------
 # Reference data (all names are invented)
@@ -301,6 +303,8 @@ def generate_tables(as_of: date, days: int = 60, seed: int = 42) -> dict[str, pd
         "DEVICE_HEALTH_DAILY": build_device_health(rng, devices, as_of, days),
         "SUPPORT_CASES": build_support_cases(rng, devices, sites, as_of, days),
         "SUBSCRIPTIONS": build_subscriptions(rng, customers, devices, sites, as_of),
+        "KB_ARTICLES": build_kb_articles(as_of),
+        "RELEASE_NOTES": build_release_notes(as_of),
     }
 
 

@@ -20,6 +20,9 @@ models:
     marts:
       +materialized: table
       +schema: marts
+    search:
+      +materialized: table
+      +schema: search
     semantic:
       +materialized: semantic_view   # from the Snowflake-Labs/dbt_semantic_view package
       +schema: semantic
