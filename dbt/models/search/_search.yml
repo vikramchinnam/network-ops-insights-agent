@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: search_documents
+    description: >
+      Every document the agent can search: knowledge base articles, firmware release notes and
+      support cases. A post-hook builds the Cortex Search service SUPPORT_DOCS on top of it.
+    columns:
+      - name: doc_id
+        tests: [unique, not_null]
+      - name: doc_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["kb_article", "release_note", "support_case"]
+      - name: content
+        description: Title and body; the column Cortex Search indexes.
+        tests: [not_null]
+      - name: customer_id
+        description: Tenant key. NULL for public documents, set for support cases.

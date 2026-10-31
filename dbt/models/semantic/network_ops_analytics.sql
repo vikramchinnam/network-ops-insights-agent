@@ -93,8 +93,8 @@ DIMENSIONS (
     cases.severity            AS severity        WITH SYNONYMS ('priority')
         COMMENT = 'P1 (most severe) to P4',
     cases.category            AS category        WITH SYNONYMS ('issue type', 'case type', 'problem'),
-        cases.case_product_model  AS product_model,
-        cases.case_firmware_version AS firmware_version
+    cases.case_product_model  AS product_model,
+    cases.case_firmware_version AS firmware_version
         COMMENT = 'Firmware on the affected device when the case was opened',
 
     subscriptions.product     AS product,
@@ -141,4 +141,4 @@ METRICS (
 
 COMMENT = 'Network operations analytics for an enterprise networking customer base (synthetic data)'
 
-AI_SQL_GENERATION 'Wi-Fi metrics (roaming and authentication failures) apply only to access points, so filter device_type to access_point when comparing them. "Critical" cases are severity P1 or P2. Relative dates such as "last week" refer to metric_date for device health and opened_date for cases. Round percentages and averages to 2 decimal places. Show currency in US dollars.Worst Wi-Fi means the highest roaming plus authentication failures per access point.'
+AI_SQL_GENERATION 'Wi-Fi metrics (roaming and authentication failures) apply only to access points, so filter device_type to access_point when comparing them. "Critical" cases are severity P1 or P2. Relative dates such as "last week" refer to metric_date for device health and opened_date for cases. Round percentages and averages to 2 decimal places. Show currency in US dollars.'

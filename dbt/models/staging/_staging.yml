@@ -67,3 +67,15 @@ models:
     columns:
       - name: subscription_id
         tests: [unique, not_null]
+
+  - name: stg_kb_articles
+    description: Knowledge base articles. One row per article.
+    columns:
+      - name: doc_id
+        tests: [unique, not_null]
+
+  - name: stg_release_notes
+    description: Firmware release notes. One row per release.
+    columns:
+      - name: doc_id
+        tests: [unique, not_null]
