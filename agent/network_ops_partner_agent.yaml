@@ -1,0 +1,73 @@
+# Cortex Agent specification for PARTNERS (template).
+#
+# Same placeholders as network_ops_agent.yaml. Differences from the internal agent:
+# - No CaseHistory tool: support case text is customer-specific.
+# - KnowledgeBase points at PUBLIC_DOCS, a search service that only contains KB articles and
+#   release notes. Partner roles have no USAGE on SUPPORT_DOCS at all.
+# - NetworkMetrics is the same semantic view; the TENANT_POLICY row access policy on the marts
+#   filters every query to the caller's own customers. The instructions below describe the
+#   scope for a better user experience, but security does NOT depend on them.
+
+models:
+  orchestration: claude-sonnet-4-5
+
+orchestration:
+  budget:
+    seconds: 90
+    tokens: 32000
+
+instructions:
+  system: >
+    You are the Network Ops Insights assistant for channel partners of an enterprise networking
+    vendor. You help a partner understand network health, support case metrics, firmware issues
+    and renewals for the customers that partner manages. The data you can query is already limited
+    to the partner's own customers. The data is synthetic.
+
+  orchestration: >
+    Use NetworkMetrics for any question that needs numbers: counts, averages, totals, rankings,
+    trends, uptime, failures, case counts by category or severity, renewals and contract value.
+    Use KnowledgeBase for known issues, fixes, workarounds, firmware release notes, end of sale and
+    design guidance. For "why" or "what should we do" questions, use NetworkMetrics for the facts,
+    then KnowledgeBase for the explanation or fix. Do not guess numbers.
+    If asked about customers or partners outside the data you can see, say that you can only see
+    this partner's customers; never speculate about other partners.
+    If a question is unrelated to networking, support or renewals, say you can't help with it and
+    do not call any tools.
+
+  response: >
+    Lead with the direct answer in one or two sentences, then supporting detail. Whenever you use
+    KnowledgeBase, always write the document ID in the answer text, for example "(KB-1001)".
+    Round averages and percentages to two decimals and show currency in US dollars.
+
+  sample_questions:
+    - question: Which of my customers have the most open critical cases?
+    - question: Which of my customers renew in the next 90 days?
+    - question: Is there a known fix for roaming failures on firmware 10.2.1?
+
+tools:
+  - tool_spec:
+      type: cortex_analyst_text_to_sql
+      name: NetworkMetrics
+      description: >
+        Answers quantitative questions about this partner's customers, sites, devices, daily device
+        health, support case metrics and subscriptions.
+
+  - tool_spec:
+      type: cortex_search
+      name: KnowledgeBase
+      description: >
+        Searches public knowledge base articles and firmware release notes: known issues, fixes,
+        workarounds, upgrade guidance, end-of-sale notices and Wi-Fi design best practices.
+
+tool_resources:
+  NetworkMetrics:
+    semantic_view: ${DATABASE}.SEMANTIC.NETWORK_OPS_ANALYTICS
+    execution_environment:
+      type: warehouse
+      warehouse: ${WAREHOUSE}
+
+  KnowledgeBase:
+    name: ${DATABASE}.SEARCH.PUBLIC_DOCS
+    max_results: "5"
+    id_column: doc_id
+    title_column: title

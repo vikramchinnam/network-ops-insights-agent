@@ -5,7 +5,8 @@
             service_name='SUPPORT_DOCS',
             search_column='content',
             attributes=['doc_type', 'category', 'product_models', 'firmware_version',
-                        'industry', 'customer_id', 'partner_id']
+                        'industry', 'customer_id', 'partner_id'],
+            comment='Support cases, KB articles and release notes. Internal roles only.'
          ) }}"
     ]
   )

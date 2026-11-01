@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('tenant_access') }}  (row access policy must exist before this table is secured)
 -- One row per device. End-of-sale flag is relative to the day the model is built.
 select
     d.device_id,

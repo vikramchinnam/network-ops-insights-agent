@@ -3,10 +3,14 @@
 Usage (from the repo root):
     uv run python agent/client.py "Which firmware has the most roaming failures?"
     uv run python agent/client.py --env dev            # interactive: type questions, Ctrl+C to quit
+    uv run python agent/client.py --agent partner "Which of my customers renew soon?"
+
+The REST call runs as your user's DEFAULT role. To try the partner agent as a partner, set your
+default role to a partner role first; run_tenant_eval.py tests personas without changing it.
 
 How it works:
   1. Sign a short-lived JWT with your private key (key-pair auth, no password).
-  2. POST the question to  /api/v2/databases/{db}/schemas/AGENTS/agents/NETWORK_OPS_AGENT:run
+  2. POST the question to  /api/v2/databases/{db}/schemas/AGENTS/agents/<agent>:run
   3. Read Server-Sent Events: print answer tokens as they arrive, and show which tools ran.
 
 This is the same call the chat app's backend makes in Stage 7.
@@ -28,7 +32,7 @@ import requests
 from cryptography.hazmat.primitives import serialization
 
 sys.path.insert(0, str(Path(__file__).parent))
-from config import AGENT_NAME, AGENT_SCHEMA, ENVIRONMENTS, snowflake_credentials  # noqa: E402
+from config import AGENT_SCHEMA, AGENTS, ENVIRONMENTS, snowflake_credentials  # noqa: E402
 
 
 # --------------------------------------------------------------------------
@@ -82,11 +86,12 @@ def iter_sse(response: requests.Response) -> Iterator[tuple[str, dict]]:
 # --------------------------------------------------------------------------
 # Agent call
 # --------------------------------------------------------------------------
-def ask(question: str, env: str = "dev", show_tools: bool = True) -> str:
+def ask(question: str, env: str = "dev", show_tools: bool = True, agent: str = "internal") -> str:
     """Send one question, stream the answer to stdout, and return the full answer text."""
     creds = snowflake_credentials()
     db = ENVIRONMENTS[env]["database"]
-    url = f"{account_url(creds['account'])}/api/v2/databases/{db}/schemas/{AGENT_SCHEMA}/agents/{AGENT_NAME}:run"
+    name = AGENTS[agent]["name"]
+    url = f"{account_url(creds['account'])}/api/v2/databases/{db}/schemas/{AGENT_SCHEMA}/agents/{name}:run"
     headers = {
         "Authorization": f"Bearer {make_jwt(creds['account'], creds['user'], creds['private_key_path'])}",
         "X-Snowflake-Authorization-Token-Type": "KEYPAIR_JWT",
@@ -121,10 +126,11 @@ def main() -> None:
     parser.add_argument("question", nargs="?", help="omit for interactive mode")
     parser.add_argument("--env", choices=list(ENVIRONMENTS), default="dev")
     parser.add_argument("--quiet", action="store_true", help="hide tool and status lines")
+    parser.add_argument("--agent", choices=list(AGENTS), default="internal")
     args = parser.parse_args()
 
     if args.question:
-        ask(args.question, args.env, show_tools=not args.quiet)
+        ask(args.question, args.env, show_tools=not args.quiet, agent=args.agent)
         return
 
     print("Ask a question (Ctrl+C to quit).")
@@ -133,7 +139,7 @@ def main() -> None:
             question = input("\nyou> ").strip()
             if question:
                 print("agent> ", end="")
-                ask(question, args.env, show_tools=not args.quiet)
+                ask(question, args.env, show_tools=not args.quiet, agent=args.agent)
     except (KeyboardInterrupt, EOFError):
         print()
 

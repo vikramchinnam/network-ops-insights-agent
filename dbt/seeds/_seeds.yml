@@ -1,0 +1,13 @@
+version: 2
+
+seeds:
+  - name: tenant_access
+    description: >
+      Which Snowflake role may see which partner's data. Read by the TENANT_POLICY row access
+      policy. Changing access = editing this file in a reviewed pull request.
+      Roles listed in var('exempt_roles') (internal and build roles) see all partners.
+    columns:
+      - name: role_name
+        tests: [not_null]
+      - name: partner_id
+        tests: [not_null]

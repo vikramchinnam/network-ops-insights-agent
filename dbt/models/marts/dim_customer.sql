@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('tenant_access') }}  (row access policy must exist before this table is secured)
 -- One row per customer, with partner details and footprint counts.
 with sites as (
     select customer_id, count(*) as site_count

@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('tenant_access') }}  (row access policy must exist before this table is secured)
 -- One row per support case.
 select
     sc.case_id,

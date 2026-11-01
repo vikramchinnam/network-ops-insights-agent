@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('tenant_access') }}  (row access policy must exist before this table is secured)
 -- One row per device per day. Grain: device_id + metric_date.
 -- Simplification: firmware_version is the device's current version, not the version on that day.
 select

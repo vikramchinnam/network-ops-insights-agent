@@ -2,7 +2,8 @@
 #
 # Two automatic checks per question:
 #   routing: the agent used every tool in expected_tools (an empty list means it should use none)
-#   facts:   the answer contains every phrase in must_mention (case-insensitive)
+#   facts:   the answer contains every phrase in must_mention (case-insensitive);
+#            an entry can be a list of alternatives, any one of which counts
 # These are fast, deterministic checks. Stage 6 adds Snowflake's LLM-judged agent evaluations
 # (answer correctness, logical consistency) on top.
 #

@@ -6,6 +6,7 @@ profile: network_ops
 model-paths: ["models"]
 macro-paths: ["macros"]
 test-paths: ["tests"]
+seed-paths: ["seeds"]
 target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
@@ -20,6 +21,9 @@ models:
     marts:
       +materialized: table
       +schema: marts
+      +post-hook:                    # row-level security on every mart (all have partner_id)
+        - "{{ drop_tenant_policies() }}"
+        - "{{ add_tenant_policy() }}"
     search:
       +materialized: table
       +schema: search
@@ -30,3 +34,21 @@ models:
       +persist_docs:                 # descriptions live in the DDL (COMMENT, WITH SYNONYMS)
         relation: false
         columns: false
+
+seeds:
+  network_ops:
+    +schema: security
+    tenant_access:
+      +post-hook:
+        - "{{ create_tenant_policy() }}"
+        - "{{ set_tenant_policy_body() }}"
+
+vars:
+  # See every row: internal support and the roles dbt builds with
+  exempt_roles: ["NOI_DBT_DEV", "NOI_DBT_PROD", "NOI_ADMIN", "NOI_SUPPORT", "SYSADMIN", "ACCOUNTADMIN"]
+  # Persona roles that get object grants after each run
+  internal_roles: ["NOI_SUPPORT"]
+  partner_roles: ["NOI_PARTNER_PTR_001", "NOI_PARTNER_PTR_002"]
+
+on-run-end:
+  - "{{ grant_consumer_access() }}"
