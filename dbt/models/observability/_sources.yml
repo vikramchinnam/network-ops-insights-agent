@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: snowflake_usage
+    description: Snowflake's own usage views. Read with IMPORTED PRIVILEGES (infra/sql/06). They lag by up to a few hours.
+    database: SNOWFLAKE
+    schema: ACCOUNT_USAGE
+    tables:
+      - name: cortex_agent_usage_history
+      - name: cortex_search_daily_usage_history
+      - name: warehouse_metering_history
+
+  - name: ops
+    description: Tables written by the Snowpark procedures in <database>.OPS (Stage 6).
+    database: "{{ target.database }}"
+    schema: OPS
+    tables:
+      - name: agent_eval_runs

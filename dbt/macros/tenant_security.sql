@@ -68,6 +68,8 @@
         {% do services.append(row['name'] | upper) %}
     {% endfor %}
     {% set has_sv = (run_query("show semantic views like 'NETWORK_OPS_ANALYTICS' in schema " ~ db ~ "." ~ semantic).rows | length) > 0 %}
+    {% set observability = generate_schema_name('observability', none) | trim %}
+    {% set has_obs = (run_query("show schemas like '" ~ observability ~ "' in database " ~ db).rows | length) > 0 %}
 
     {% set roles = var('internal_roles') + var('partner_roles') %}
     {% for role in roles %}
@@ -88,6 +90,11 @@
         {# Only internal roles may search support cases, which contain customer-specific text #}
         {% if role in var('internal_roles') and 'SUPPORT_DOCS' in services %}
             {% do stmts.append("grant usage on cortex search service " ~ db ~ "." ~ search ~ ".SUPPORT_DOCS to role " ~ role) %}
+        {% endif %}
+        {# Cost and quality data is internal only #}
+        {% if role in var('internal_roles') and has_obs %}
+            {% do stmts.append("grant usage on schema " ~ db ~ "." ~ observability ~ " to role " ~ role) %}
+            {% do stmts.append("grant select on all views in schema " ~ db ~ "." ~ observability ~ " to role " ~ role) %}
         {% endif %}
         {% for s in stmts %}{% do run_query(s) %}{% endfor %}
     {% endfor %}

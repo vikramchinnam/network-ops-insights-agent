@@ -30,3 +30,8 @@ agent/evals/results/*.json
 .idea/
 .DS_Store
 dbt/.user.yml
+.pytest_tmp/
+# --- Snowflake CLI build output ---
+snowpark/*.zip
+snowpark/src/*.zip
+snowpark/output/

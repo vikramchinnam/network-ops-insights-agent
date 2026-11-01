@@ -741,7 +741,7 @@ wheels = [
 
 [[package]]
 name = "network-ops-insights-agent"
-version = "0.5.1"
+version = "0.6.0"
 source = { editable = "." }
 dependencies = [
     { name = "dbt-snowflake" },

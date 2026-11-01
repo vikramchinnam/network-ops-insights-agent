@@ -1,0 +1,62 @@
+# Snowpark project definition for the Snowflake CLI.
+#
+#   cd snowpark
+#   snow snowpark build                       # zip src/noi_snowpark into the deploy root
+#   snow snowpark deploy --replace -c noi --database NOI_DEV --schema OPS --role NOI_DBT_DEV --warehouse NOI_WH_DEV
+#
+# Database, schema, role and warehouse come from the command line, so the same file deploys
+# to Dev and Prod (Stage 8 CI passes NOI_PROD and NOI_DBT_PROD).
+
+definition_version: "2"
+
+mixins:
+  snowpark_shared:
+    stage: SNOWPARK_ARTIFACTS          # internal stage in the target schema (OPS)
+    artifacts:
+      # src/ (not src/noi_snowpark/) so the zip contains the noi_snowpark/ package folder;
+      # the CLI puts the *contents* of src at the zip root.
+      - src: src/
+        dest: app/
+    runtime: "3.12"
+    # Third-party packages are listed in requirements.txt (next to this file). `snow snowpark build`
+    # checks each against Snowflake's Anaconda channel; available ones are installed by Snowflake,
+    # anything else is downloaded and zipped with the code.
+
+entities:
+  generate_data:
+    type: procedure
+    identifier:
+      name: GENERATE_DATA
+    handler: noi_snowpark.procedures.generate_data
+    signature:
+      - name: days
+        type: int
+        default: "60"
+      - name: seed
+        type: int
+        default: "42"
+    returns: string
+    meta:
+      use_mixins: [snowpark_shared]
+
+  compute_customer_health:
+    type: procedure
+    identifier:
+      name: COMPUTE_CUSTOMER_HEALTH
+    handler: noi_snowpark.procedures.compute_customer_health
+    signature: ""
+    returns: string
+    meta:
+      use_mixins: [snowpark_shared]
+
+  run_agent_eval:
+    type: procedure
+    identifier:
+      name: RUN_AGENT_EVAL
+    handler: noi_snowpark.procedures.run_agent_eval
+    signature:
+      - name: agent_fqn
+        type: string
+    returns: string
+    meta:
+      use_mixins: [snowpark_shared]

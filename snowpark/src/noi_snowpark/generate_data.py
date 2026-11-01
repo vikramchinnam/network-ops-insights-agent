@@ -317,13 +317,22 @@ ENVIRONMENTS = {
 }
 
 
-def write_to_snowflake(session, tables: dict[str, pd.DataFrame]) -> None:
-    """Replace each RAW table. Used locally and, in Stage 6, inside a stored procedure."""
+def write_to_snowflake(session, tables: dict[str, pd.DataFrame], database: str | None = None,
+                       schema: str | None = None) -> dict[str, int]:
+    """Replace each RAW table. Used locally and inside the GENERATE_DATA stored procedure.
+
+    database/schema: set explicitly inside a procedure, where the session's current schema is the
+    procedure's own schema (OPS), not RAW. Returns row counts per table.
+    """
+    counts = {}
     for name, df in tables.items():
         session.write_pandas(
-            df, table_name=name, auto_create_table=True, overwrite=True, use_logical_type=True
+            df, table_name=name, database=database, schema=schema,
+            auto_create_table=True, overwrite=True, use_logical_type=True,
         )
+        counts[name] = len(df)
         print(f"  loaded {name:<22} {len(df):>8,} rows")
+    return counts
 
 
 def create_session(env: str, role: str | None = None, secondary_roles: bool = True):

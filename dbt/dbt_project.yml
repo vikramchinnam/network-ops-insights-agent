@@ -1,5 +1,5 @@
 name: network_ops
-version: "0.2.0"
+version: "0.6.0"
 config-version: 2
 profile: network_ops
 
@@ -27,6 +27,9 @@ models:
     search:
       +materialized: table
       +schema: search
+    observability:
+      +materialized: view            # usage views lag anyway; views cost nothing at rest
+      +schema: observability
     semantic:
       +materialized: semantic_view   # from the Snowflake-Labs/dbt_semantic_view package
       +schema: semantic
