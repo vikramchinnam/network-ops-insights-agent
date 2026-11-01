@@ -22,6 +22,9 @@ dbt/logs/
 # --- Local generator output ---
 data/
 
+# --- Raw agent eval runs (summaries go in agent/evals/results/*.md) ---
+agent/evals/results/*.json
+
 # --- Editors / OS ---
 .vscode/
 .idea/

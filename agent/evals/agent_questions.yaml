@@ -1,0 +1,50 @@
+# Evaluation set for the Cortex Agent (Stage 5).
+#
+# Two automatic checks per question:
+#   routing: the agent used every tool in expected_tools (an empty list means it should use none)
+#   facts:   the answer contains every phrase in must_mention (case-insensitive)
+# These are fast, deterministic checks. Stage 6 adds Snowflake's LLM-judged agent evaluations
+# (answer correctness, logical consistency) on top.
+#
+# Tool names match agent/network_ops_agent.yaml: NetworkMetrics, KnowledgeBase, CaseHistory.
+
+questions:
+  - id: a01_metrics_roaming
+    question: Which access point firmware version has the most roaming failures per device per day?
+    expected_tools: [NetworkMetrics]
+    must_mention: ["10.2.1"]
+
+  - id: a02_kb_fix
+    question: Is there a known fix for roaming failures on firmware 10.2.1?
+    expected_tools: [KnowledgeBase]
+    must_mention: ["10.3.0", "KB-1001"]
+
+  - id: a03_why_and_what_to_do
+    question: Why are hospitals seeing roaming problems, and what should they do about it?
+    expected_tools: [NetworkMetrics, KnowledgeBase]
+    must_mention: ["10.2.1", "10.3.0"]
+
+  - id: a04_case_history
+    question: Have customers reported 802.1X authentication timeouts? What did they describe?
+    expected_tools: [CaseHistory]
+    must_mention: ["RADIUS"]
+
+  - id: a05_metrics_critical
+    question: How many open critical cases are there in each industry?
+    expected_tools: [NetworkMetrics]
+    must_mention: []
+
+  - id: a06_kb_eos
+    question: What should we replace the AX-200 with, and when does it reach end of sale?
+    expected_tools: [KnowledgeBase]
+    must_mention: ["AX-400", ["2026-12-31", "December 31, 2026", "Dec 31, 2026", "31 December 2026", "12/31/2026"]]
+
+  - id: a07_renewals_and_cases
+    question: Which customers renewing in the next 90 days have open critical cases, and what are those cases about?
+    expected_tools: [NetworkMetrics, CaseHistory]
+    must_mention: []
+
+  - id: a08_out_of_scope
+    question: What's a good recipe for banana bread?
+    expected_tools: []
+    must_mention: []

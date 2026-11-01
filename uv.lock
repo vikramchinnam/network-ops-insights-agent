@@ -741,14 +741,16 @@ wheels = [
 
 [[package]]
 name = "network-ops-insights-agent"
-version = "0.2.0"
+version = "0.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "dbt-snowflake" },
     { name = "faker" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pyjwt" },
     { name = "pyyaml" },
+    { name = "requests" },
     { name = "snowflake-snowpark-python", extra = ["pandas"] },
 ]
 
@@ -763,7 +765,9 @@ requires-dist = [
     { name = "dbt-snowflake", specifier = ">=1.10,<2.0" },
     { name = "faker", specifier = ">=30.0" },
     { name = "numpy", specifier = ">=1.26" },
+    { name = "pyjwt", specifier = ">=2.8" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "requests", specifier = ">=2.31" },
     { name = "snowflake-snowpark-python", extras = ["pandas"], specifier = ">=1.30" },
 ]
 
