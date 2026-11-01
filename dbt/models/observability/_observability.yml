@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: fct_agent_requests
+    description: One row per Cortex Agent request in this database, with user, role, latency, tokens and credits.
+    columns:
+      - name: request_id
+        tests: [not_null]
+      - name: credits
+        description: Token credits for the request (agent orchestration and tool tokens).
+
+  - name: fct_ai_cost_daily
+    description: Daily credits by category (agent, search, warehouse) and object. Resource monitors don't cap agent or search spend, so this is where it's watched.
+    columns:
+      - name: cost_category
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["agent", "search", "warehouse"]
+
+  - name: fct_eval_runs
+    description: One row per agent eval run from the RUN_AGENT_EVAL procedure; tracks answer quality and latency over time.
+    columns:
+      - name: run_id
+        tests: [unique, not_null]

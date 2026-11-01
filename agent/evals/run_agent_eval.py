@@ -1,4 +1,4 @@
-"""Score the Cortex Agent against agent/evals/agent_questions.yaml.
+"""Score the Cortex Agent against the question set in snowpark/src/noi_snowpark/agent_questions.yaml.
 
 Usage (from the repo root):
     uv run python agent/evals/run_agent_eval.py
@@ -17,53 +17,13 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import yaml
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from config import AGENTS, ENVIRONMENTS, agent_fqn  # noqa: E402
 
-EVAL_FILE = Path(__file__).with_name("agent_questions.yaml")
 RESULTS_DIR = Path(__file__).with_name("results")
 
-# Since April 2026, agents generate SQL from semantic views themselves; that step appears as a
-# tool of type "system_execute_sql" rather than the Analyst tool's own name. Count it as NetworkMetrics.
-SQL_TOOL_TYPES = {"system_execute_sql", "cortex_analyst_text_to_sql"}
-
-
-def run_agent(session, agent: str, question: str) -> dict:
-    body = {"messages": [{"role": "user", "content": [{"type": "text", "text": question}]}]}
-    row = session.sql(
-        "select snowflake.cortex.data_agent_run(?, ?) as r", params=[agent, json.dumps(body)]
-    ).collect()[0]
-    return json.loads(row["R"])
-
-
-def summarize(response: dict) -> tuple[set[str], str]:
-    """Return (tools used, answer text) from a DATA_AGENT_RUN response."""
-    tools, texts = set(), []
-    for item in response.get("content", []):
-        kind = item.get("type")
-        if kind == "tool_use":
-            use = item.get("tool_use", {})
-            name, tool_type = use.get("name", ""), use.get("type", "")
-            tools.add("NetworkMetrics" if tool_type in SQL_TOOL_TYPES or name in SQL_TOOL_TYPES else name)
-        elif kind == "text":
-            texts.append(item.get("text", ""))
-    return tools, "\n".join(texts).strip()
-
-
-def score(q: dict, tools: set[str], answer: str) -> tuple[bool, bool, list[str]]:
-    expected = set(q.get("expected_tools", []))
-    routing_ok = (not tools) if not expected else expected <= tools
-    # Each must_mention entry is a phrase, or a list of acceptable alternatives (any one counts),
-    # e.g. ["2026-12-31", "December 31, 2026"] so the check doesn't fail on date formatting.
-    text = answer.lower()
-    missing = []
-    for item in q.get("must_mention", []):
-        options = item if isinstance(item, list) else [item]
-        if not any(opt.lower() in text for opt in options):
-            missing.append(item)
-    return routing_ok, not missing, missing
+# Shared with the RUN_AGENT_EVAL stored procedure (Stage 6): one implementation in two places.
+from noi_snowpark.agent_eval import load_questions, run_agent, score, summarize  # noqa: E402,F401
 
 
 def main() -> None:
@@ -76,7 +36,7 @@ def main() -> None:
 
     from noi_snowpark.generate_data import create_session
 
-    questions = yaml.safe_load(EVAL_FILE.read_text())["questions"]
+    questions = load_questions()
     if args.only:
         questions = [q for q in questions if q["id"] == args.only]
 

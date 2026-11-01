@@ -1,12 +1,6 @@
 """Offline tests for agent eval scoring."""
 
-import importlib.util
-from pathlib import Path
-
-spec = importlib.util.spec_from_file_location(
-    "run_agent_eval", Path(__file__).resolve().parents[1] / "agent" / "evals" / "run_agent_eval.py")
-run_agent_eval = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(run_agent_eval)
+from noi_snowpark import agent_eval as run_agent_eval  # shared by the local runner and the procedure
 
 
 def test_summarize_maps_sql_tool_to_network_metrics():
@@ -37,3 +31,9 @@ def test_score_accepts_alternatives():
     assert run_agent_eval.score(q, set(), "Replace with the AX-400 before December 31, 2026.")[2] == []
     missing = run_agent_eval.score(q, set(), "Replace with the AX-400.")[2]
     assert missing == [["2026-12-31", "December 31, 2026"]]
+
+
+def test_question_set_loads_from_the_package():
+    questions = run_agent_eval.load_questions()
+    assert len(questions) >= 8
+    assert {"id", "question", "expected_tools", "must_mention"} <= set(questions[0])
