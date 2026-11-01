@@ -1,6 +1,6 @@
 [project]
 name = "network-ops-insights-agent"
-version = "0.2.0"
+version = "0.5.0"
 description = "AI agent on Snowflake for an enterprise networking customer base (synthetic data)"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -9,6 +9,8 @@ dependencies = [
     "numpy>=1.26",
     "faker>=30.0",
     "pyyaml>=6.0",
+    "pyjwt>=2.8",
+    "requests>=2.31",
     "dbt-snowflake>=1.10,<2.0",
 ]
 
@@ -27,3 +29,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["snowpark/src/noi_snowpark"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

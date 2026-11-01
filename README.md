@@ -35,8 +35,8 @@ Raw synthetic data  ◄── Snowpark Python procedures (generator, health scor
 - [x] **Stage 1 — Foundations:** repo, Snowflake CLI, roles, warehouses, cost guardrails → [guide](docs/stages/01-foundations.md)
 - [x] **Stage 2 — dbt basics:** synthetic data, staging and marts, Dev/Prod targets → [guide](docs/stages/02-dbt-basics.md)
 - [x] **Stage 3 — Semantic view:** `dbt_semantic_view` package + Cortex Analyst → [guide](docs/stages/03-semantic-view.md)
-- [ ] **Stage 4 — Cortex Search:** case notes, KB articles, release notes → [guide](docs/stages/04-cortex-search.md)
-- [ ] **Stage 5 — Cortex Agent:** agent spec + Python client
+- [x] **Stage 4 — Cortex Search:** case notes, KB articles, release notes → [guide](docs/stages/04-cortex-search.md)
+- [ ] **Stage 5 — Cortex Agent:** agent spec + Python client → [5A guide](docs/stages/05a-cortex-agent.md)
 - [ ] **Stage 6 — Snowpark procedures:** generator, health score, evals
 - [ ] **Stage 7 — Containers:** chat app on Snowpark Container Services
 - [ ] **Stage 8 — CI/CD:** GitHub Actions, OIDC, Dev → Prod approvals, review bot
@@ -46,7 +46,9 @@ Raw synthetic data  ◄── Snowpark Python procedures (generator, health scor
 ```powershell
 uv sync                                                    # Python env with Snowpark + dbt
 uv run python -m noi_snowpark.generate_data --env dev      # load synthetic data
-cd dbt; uv run dbt build                                   # build and test models
+cd dbt; uv run dbt build; cd ..                             # build and test models
+uv run python agent/deploy_agent.py --env dev              # deploy the Cortex Agent
+uv run python agent/client.py "Is there a fix for roaming drops on 10.2.1?"
 ```
 
 Full setup: [Stage 1 guide](docs/stages/01-foundations.md), then [Stage 2 guide](docs/stages/02-dbt-basics.md).
