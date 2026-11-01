@@ -18,3 +18,16 @@ models:
         tests: [not_null]
       - name: customer_id
         description: Tenant key. NULL for public documents, set for support cases.
+
+  - name: public_documents
+    description: >
+      Knowledge base articles and release notes only. A post-hook builds the PUBLIC_DOCS search
+      service, the only search service partner roles can use.
+    columns:
+      - name: doc_id
+        tests: [unique, not_null]
+      - name: doc_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["kb_article", "release_note"]

@@ -326,21 +326,29 @@ def write_to_snowflake(session, tables: dict[str, pd.DataFrame]) -> None:
         print(f"  loaded {name:<22} {len(df):>8,} rows")
 
 
-def create_session(env: str):
-    """Key-pair session from environment variables (same ones dbt uses)."""
+def create_session(env: str, role: str | None = None, secondary_roles: bool = True):
+    """Key-pair session from environment variables (same ones dbt uses).
+
+    role: override the environment's default role (persona tests run as partner roles).
+    secondary_roles=False: run USE SECONDARY ROLES NONE, so the session has ONLY `role`'s
+    privileges. Persona tests need this; otherwise your other roles leak into the session.
+    """
     from snowflake.snowpark import Session  # imported here so --dry-run needs no Snowflake libs
 
     cfg = ENVIRONMENTS[env]
-    return Session.builder.configs({
+    session = Session.builder.configs({
         "account": os.environ["SNOWFLAKE_ACCOUNT"],
         "user": os.environ["SNOWFLAKE_USER"],
         "authenticator": "SNOWFLAKE_JWT",
         "private_key_file": os.environ["SNOWFLAKE_PRIVATE_KEY_PATH"],
-        "role": cfg["role"],
+        "role": role or cfg["role"],
         "warehouse": cfg["warehouse"],
         "database": cfg["database"],
         "schema": "RAW",
     }).create()
+    if not secondary_roles:
+        session.sql("use secondary roles none").collect()
+    return session
 
 
 def main() -> None:

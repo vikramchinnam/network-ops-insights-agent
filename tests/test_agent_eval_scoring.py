@@ -31,6 +31,7 @@ def test_score_out_of_scope_requires_no_tools():
     assert run_agent_eval.score(q, set(), "I can't help with that.")[0] is True
     assert run_agent_eval.score(q, {"KnowledgeBase"}, "...")[0] is False
 
+
 def test_score_accepts_alternatives():
     q = {"expected_tools": [], "must_mention": ["AX-400", ["2026-12-31", "December 31, 2026"]]}
     assert run_agent_eval.score(q, set(), "Replace with the AX-400 before December 31, 2026.")[2] == []

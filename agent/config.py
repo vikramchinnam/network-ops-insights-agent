@@ -1,4 +1,4 @@
-"""Shared settings for the agent scripts: one place for names that differ by environment."""
+"""Shared settings for the agent scripts: one place for names that differ by environment or audience."""
 
 from __future__ import annotations
 
@@ -10,12 +10,28 @@ ENVIRONMENTS = {
 }
 
 AGENT_SCHEMA = "AGENTS"
-AGENT_NAME = "NETWORK_OPS_AGENT"
+
+# One agent per audience. grant_to: roles that receive USAGE on the agent at deploy time.
+AGENTS = {
+    "internal": {
+        "name": "NETWORK_OPS_AGENT",
+        "spec": "network_ops_agent.yaml",
+        "grant_to": ["NOI_SUPPORT"],
+    },
+    "partner": {
+        "name": "NETWORK_OPS_PARTNER_AGENT",
+        "spec": "network_ops_partner_agent.yaml",
+        "grant_to": ["NOI_PARTNER_PTR_001", "NOI_PARTNER_PTR_002"],
+    },
+}
+
+# Kept for backwards compatibility with Stage 5A scripts
+AGENT_NAME = AGENTS["internal"]["name"]
 
 
-def agent_fqn(env: str) -> str:
+def agent_fqn(env: str, agent: str = "internal") -> str:
     """Fully qualified agent name, e.g. NOI_DEV.AGENTS.NETWORK_OPS_AGENT."""
-    return f"{ENVIRONMENTS[env]['database']}.{AGENT_SCHEMA}.{AGENT_NAME}"
+    return f"{ENVIRONMENTS[env]['database']}.{AGENT_SCHEMA}.{AGENTS[agent]['name']}"
 
 
 def snowflake_credentials() -> dict[str, str]:

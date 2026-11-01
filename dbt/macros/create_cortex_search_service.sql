@@ -6,13 +6,13 @@
   Why replace on every build: dbt recreates the source table, and the service must
   point at the new table. The document set is small, so re-indexing is cheap.
 #}
-{% macro create_cortex_search_service(service_name, search_column, attributes, target_lag='1 day') %}
+{% macro create_cortex_search_service(service_name, search_column, attributes, target_lag='1 day', comment='Built by dbt') %}
     create or replace cortex search service {{ this.database }}.{{ this.schema }}.{{ service_name }}
         on {{ search_column }}
         attributes {{ attributes | join(', ') }}
         warehouse = {{ target.warehouse }}
         target_lag = '{{ target_lag }}'
-        comment = 'Support cases, knowledge base articles and release notes (built by dbt)'
+        comment = '{{ comment }}'
     as (
         select * from {{ this }}
     )

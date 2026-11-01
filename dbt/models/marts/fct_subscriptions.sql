@@ -1,3 +1,4 @@
+-- depends_on: {{ ref('tenant_access') }}  (row access policy must exist before this table is secured)
 -- One row per subscription. Renewal flags are relative to the day the model is built.
 select
     sub.subscription_id,

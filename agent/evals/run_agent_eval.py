@@ -20,7 +20,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from config import ENVIRONMENTS, agent_fqn  # noqa: E402
+from config import AGENTS, ENVIRONMENTS, agent_fqn  # noqa: E402
 
 EVAL_FILE = Path(__file__).with_name("agent_questions.yaml")
 RESULTS_DIR = Path(__file__).with_name("results")
@@ -55,8 +55,8 @@ def summarize(response: dict) -> tuple[set[str], str]:
 def score(q: dict, tools: set[str], answer: str) -> tuple[bool, bool, list[str]]:
     expected = set(q.get("expected_tools", []))
     routing_ok = (not tools) if not expected else expected <= tools
-    #missing = [p for p in q.get("must_mention", []) if p.lower() not in answer.lower()]
-        # Each must_mention entry is a phrase, or a list of acceptable alternatives (any one counts)
+    # Each must_mention entry is a phrase, or a list of acceptable alternatives (any one counts),
+    # e.g. ["2026-12-31", "December 31, 2026"] so the check doesn't fail on date formatting.
     text = answer.lower()
     missing = []
     for item in q.get("must_mention", []):
@@ -69,6 +69,7 @@ def score(q: dict, tools: set[str], answer: str) -> tuple[bool, bool, list[str]]
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", choices=list(ENVIRONMENTS), default="dev")
+    parser.add_argument("--agent", choices=list(AGENTS), default="internal")
     parser.add_argument("--only", help="run a single question id")
     parser.add_argument("--show-answers", action="store_true")
     args = parser.parse_args()
@@ -79,7 +80,7 @@ def main() -> None:
     if args.only:
         questions = [q for q in questions if q["id"] == args.only]
 
-    agent = agent_fqn(args.env)
+    agent = agent_fqn(args.env, args.agent)
     session = create_session(args.env)
     results = []
     print(f"\nAgent: {agent}   role: {session.get_current_role()}\n")

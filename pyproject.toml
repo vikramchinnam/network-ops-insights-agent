@@ -1,6 +1,6 @@
 [project]
 name = "network-ops-insights-agent"
-version = "0.5.0"
+version = "0.5.1"
 description = "AI agent on Snowflake for an enterprise networking customer base (synthetic data)"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"

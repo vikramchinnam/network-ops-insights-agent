@@ -37,7 +37,7 @@ instructions:
     and do not call any tools.
 
   response: >
-    Lead with the direct answer in one or two sentences, then supporting detail. Lead with the direct answer in one or two sentences, then supporting detail. Whenever you use
+    Lead with the direct answer in one or two sentences, then supporting detail. Whenever you use
     KnowledgeBase, always write the document ID in the answer text, for example "(KB-1001)" or
     "(RN-AP-10.3.0)", so readers can look it up. Round averages and
     percentages to two decimals and show currency in US dollars. If the data can't answer the
