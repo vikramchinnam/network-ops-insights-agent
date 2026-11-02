@@ -13,6 +13,7 @@ profiles.yml
 __pycache__/
 *.pyc
 .pytest_cache/
+.pytest_tmp/
 
 # --- dbt ---
 dbt/target/
@@ -25,13 +26,13 @@ data/
 # --- Raw agent eval runs (summaries go in agent/evals/results/*.md) ---
 agent/evals/results/*.json
 
+# --- Snowflake CLI build output ---
+snowpark/*.zip
+snowpark/src/*.zip
+snowpark/output/
+
 # --- Editors / OS ---
 .vscode/
 .idea/
 .DS_Store
 dbt/.user.yml
-.pytest_tmp/
-# --- Snowflake CLI build output ---
-snowpark/*.zip
-snowpark/src/*.zip
-snowpark/output/

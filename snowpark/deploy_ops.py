@@ -7,8 +7,9 @@ Usage (from the repo root):
     uv run python snowpark/deploy_ops.py tasks  --env dev --resume   # turn the schedules on
 
 setup   creates the OPS schema, the artifact stage and the tables the procedures write to.
-grants  lets internal and partner roles read health scores (the tenant policy filters rows) and
-        internal roles read eval runs.
+grants  lets internal and partner roles read health scores (the tenant policy filters rows),
+        internal roles read eval runs and app requests, and the app's service role write the
+        request log. Run after infra/sql/07_spcs.sql has created NOI_SPCS.
 tasks   creates two Snowflake Tasks that call the procedures on a schedule. They are created
         SUSPENDED so nothing runs (or costs) until you choose to resume them.
 """
@@ -46,6 +47,19 @@ def setup_sql(env: str) -> list[str]:
                 error           varchar,
                 response        variant     comment 'Full DATA_AGENT_RUN response: tool calls, SQL, search hits (the trace)'
             ) comment = 'One row per question per agent eval run, written by RUN_AGENT_EVAL'""",
+        f"""create table if not exists {db}.OPS.APP_REQUESTS (
+                request_id      varchar,
+                requested_at    timestamp_ltz,
+                user_name       varchar,
+                role_name       varchar,
+                agent_name      varchar,
+                question        varchar,
+                answer          varchar,
+                tools_used      array,
+                latency_ms      number,
+                error           varchar,
+                response        variant     comment 'Full agent response: the trace shown in the app'
+            ) comment = 'One row per question asked in the chat app (Stage 7)'""",
         *[f"""create table if not exists {db}.OPS.{name} (
                 customer_id                    varchar,
                 customer_name                  varchar,
@@ -79,7 +93,13 @@ def grants_sql(env: str) -> list[str]:
         statements += [
             f"grant select on table {db}.OPS.CUSTOMER_HEALTH_HISTORY to role {role}",
             f"grant select on table {db}.OPS.AGENT_EVAL_RUNS to role {role}",
+            f"grant select on table {db}.OPS.APP_REQUESTS to role {role}",
         ]
+    # The chat app's service role writes the request log (never reads business data as itself)
+    statements += [
+        f"grant usage on schema {db}.OPS to role NOI_SPCS",
+        f"grant insert on table {db}.OPS.APP_REQUESTS to role NOI_SPCS",
+    ]
     return statements
 
 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Ops Insights</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Network Ops Insights <span class="muted">· synthetic data</span></div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="chat" role="tab">Chat</button>
+      <button class="tab" data-tab="obs" role="tab">Observability</button>
+    </nav>
+    <div id="who" class="who muted">Connecting…</div>
+  </header>
+
+  <main>
+    <section id="tab-chat" class="tab-panel active">
+      <div class="chat-layout">
+        <div class="chat">
+          <div id="messages" class="messages" aria-live="polite">
+            <div class="hint">
+              <p>Ask about network health, support cases, firmware or renewals. Try:</p>
+              <button class="suggest">Which access point firmware has the most roaming failures?</button>
+              <button class="suggest">Is there a known fix for roaming failures on 10.2.1?</button>
+              <button class="suggest">Which customers renewing in the next 90 days have open critical cases?</button>
+            </div>
+          </div>
+          <form id="ask" class="ask">
+            <input id="question" autocomplete="off" maxlength="2000" placeholder="Ask a question…" required>
+            <button id="send" type="submit">Ask</button>
+          </form>
+        </div>
+        <aside class="trace">
+          <h2>Trace</h2>
+          <div id="trace-summary" class="muted">Each answer's steps appear here: tools called, SQL run, documents found.</div>
+          <ol id="trace-steps" class="steps"></ol>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tab-obs" class="tab-panel">
+      <div id="obs-error" class="notice" hidden></div>
+      <div id="obs" hidden>
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-label">Latest eval</div><div id="k-eval" class="kpi-value">–</div></div>
+          <div class="kpi"><div class="kpi-label">Credits per request (latest day)</div><div id="k-cpr" class="kpi-value">–</div></div>
+          <div class="kpi"><div class="kpi-label">Agent requests (14 days)</div><div id="k-req" class="kpi-value">–</div></div>
+          <div class="kpi"><div class="kpi-label">AI + compute credits (14 days)</div><div id="k-credits" class="kpi-value">–</div></div>
+        </div>
+        <div class="card">
+          <h3>Credits per day by category</h3>
+          <div class="legend"><span class="sw agent"></span>agent <span class="sw search"></span>search <span class="sw warehouse"></span>warehouse</div>
+          <div id="cost-chart" class="bars"></div>
+          <p class="muted small">Billed credits from Snowflake usage views; they lag by up to a few hours.</p>
+        </div>
+        <div class="grid2">
+          <div class="card"><h3>Eval runs</h3><table id="t-evals"></table></div>
+          <div class="card"><h3>Recent app requests <span class="muted small">(click for trace)</span></h3><table id="t-requests"></table></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

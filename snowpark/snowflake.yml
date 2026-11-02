@@ -14,7 +14,7 @@ mixins:
     stage: SNOWPARK_ARTIFACTS          # internal stage in the target schema (OPS)
     artifacts:
       # src/ (not src/noi_snowpark/) so the zip contains the noi_snowpark/ package folder;
-      # the CLI puts the *contents* of src at the zip root.
+      # the CLI puts the *contents* of src at the zip root, and `dest` becomes the zip name.
       - src: src/
         dest: app/
     runtime: "3.12"

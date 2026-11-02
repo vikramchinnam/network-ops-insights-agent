@@ -1,6 +1,6 @@
 [project]
 name = "network-ops-insights-agent"
-version = "0.6.0"
+version = "0.7.0"
 description = "AI agent on Snowflake for an enterprise networking customer base (synthetic data)"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -18,6 +18,9 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "ruff>=0.6",
+    "fastapi>=0.115",      # chat app (spcs/app); the container pins exact versions in spcs/requirements.txt
+    "uvicorn>=0.30",
+    "httpx>=0.27",         # FastAPI test client
 ]
 
 [tool.ruff]
@@ -31,5 +34,5 @@ build-backend = "hatchling.build"
 packages = ["snowpark/src/noi_snowpark"]
 
 [tool.pytest.ini_options]
-addopts = "--basetemp=.pytest_tmp"
 testpaths = ["tests"]
+addopts = "--basetemp=.pytest_tmp"   # avoids Windows temp-folder permission errors
