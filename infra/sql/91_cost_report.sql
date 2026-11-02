@@ -47,3 +47,10 @@ FROM SNOWFLAKE.ACCOUNT_USAGE.CORTEX_AGENT_USAGE_HISTORY
 WHERE start_time >= DATEADD(day, -30, CURRENT_TIMESTAMP())
 GROUP BY 1, 2
 ORDER BY usage_date DESC, token_credits DESC;
+
+-- Container Services: compute pool credits per day, last 30 days
+SELECT DATE(start_time) AS usage_date, compute_pool_name, ROUND(SUM(credits_used), 4) AS credits
+FROM SNOWFLAKE.ACCOUNT_USAGE.SNOWPARK_CONTAINER_SERVICES_HISTORY
+WHERE start_time >= DATEADD(day, -30, CURRENT_TIMESTAMP())
+GROUP BY 1, 2
+ORDER BY 1 DESC;

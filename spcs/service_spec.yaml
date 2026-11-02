@@ -1,0 +1,23 @@
+# Snowpark Container Services service specification (template).
+# deploy_service.py fills in IMAGE, DATABASE and WAREHOUSE for the target environment.
+
+spec:
+  containers:
+    - name: app
+      image: ${IMAGE}
+      env:
+        NOI_DATABASE: ${DATABASE}
+        NOI_WAREHOUSE: ${WAREHOUSE}
+      readinessProbe:          # Snowflake routes traffic only once /healthz answers
+        port: 8080
+        path: /healthz
+  endpoints:
+    - name: ui
+      port: 8080
+      public: true             # reachable from a browser; Snowflake requires sign-in first
+
+# Caller's rights: Snowflake adds the Sf-Context-Current-User-Token header to each request,
+# so the app can run queries as the signed-in user instead of as the service.
+capabilities:
+  securityContext:
+    executeAsCaller: true
